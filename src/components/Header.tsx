@@ -1,0 +1,46 @@
+import { useProgressStore } from "../store";
+import ProgressBar from "./ProgressBar";
+
+interface HeaderProps {
+  overallPercent: number;
+}
+
+export default function Header({ overallPercent }: HeaderProps) {
+  const handleExport = () => {
+    const json = useProgressStore.getState().exportProgress();
+    const blob = new Blob([json], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const date = new Date().toISOString().slice(0, 10);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `physics-progress-${date}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
+  return (
+    <header className="sticky top-0 z-10 bg-slate-900 border-b border-slate-700">
+      <div className="max-w-4xl mx-auto px-4 py-3 flex items-center gap-3">
+        <span className="text-xs text-slate-400 shrink-0">Physics Trainer</span>
+
+        <div className="flex-1 min-w-0 flex items-center gap-2">
+          <span className="text-xs text-slate-300 shrink-0">
+            Готовность: {overallPercent}%
+          </span>
+          <ProgressBar percent={overallPercent} height="sm" />
+        </div>
+
+        <button
+          type="button"
+          onClick={handleExport}
+          className="shrink-0 px-2 py-1 text-xs text-slate-200 bg-slate-800 hover:bg-slate-700 rounded-md border border-slate-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-400"
+          title="Экспорт прогресса"
+        >
+          ⤓ Экспорт
+        </button>
+      </div>
+    </header>
+  );
+}
