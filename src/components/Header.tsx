@@ -49,6 +49,15 @@ export default function Header({ overallPercent }: HeaderProps) {
 
         <button
           type="button"
+          onClick={() => navigateTo({ kind: "exam" })}
+          className="shrink-0 px-3 py-1.5 text-xs font-medium bg-red-900 hover:bg-red-800 rounded-lg transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-400"
+          title="Экзамен — таймер 2 минуты, без подсказок"
+        >
+          🎓<span className="hidden sm:inline ml-1">Экзамен</span>
+        </button>
+
+        <button
+          type="button"
           onClick={() => navigateTo({ kind: "errors" })}
           className="relative shrink-0 px-3 py-1.5 text-xs font-medium bg-slate-800 hover:bg-slate-700 rounded-lg transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-400"
           title="Журнал ошибок"

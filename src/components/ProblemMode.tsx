@@ -8,6 +8,8 @@ interface Props {
   onClose: () => void;
 }
 
+type Stage = "writing" | "comparing";
+
 export default function ProblemMode({ billet, onClose }: Props) {
   const markProblemSolved = useProgressStore((s) => s.markProblemSolved);
   const addError = useErrorsStore((s) => s.addError);
@@ -16,7 +18,8 @@ export default function ProblemMode({ billet, onClose }: Props) {
     (s) => s.billets[billet.id]?.problemSolved ?? false,
   );
 
-  const [showSolution, setShowSolution] = useState(false);
+  const [stage, setStage] = useState<Stage>("writing");
+  const [mySolution, setMySolution] = useState("");
 
   const finalize = (solved: boolean) => {
     markProblemSolved(billet.id, solved);
@@ -51,6 +54,7 @@ export default function ProblemMode({ billet, onClose }: Props) {
             ✕
           </button>
         </div>
+
         <h2 className="text-lg font-semibold">{billet.problem.title}</h2>
 
         <div className="text-sm text-slate-200 leading-relaxed whitespace-pre-wrap">
@@ -76,17 +80,44 @@ export default function ProblemMode({ billet, onClose }: Props) {
           <div className="text-sm text-slate-200">{billet.problem.find}</div>
         </div>
 
-        {!showSolution ? (
-          <button
-            onClick={() => setShowSolution(true)}
-            className="w-full bg-slate-700 hover:bg-slate-600 rounded-lg py-3 font-medium"
-          >
-            Я решил — показать ход решения
-          </button>
-        ) : (
+        {stage === "writing" && (
           <>
-            <div className="bg-slate-800 rounded-lg p-3 space-y-2">
-              <div className="text-xs text-slate-400">Ход решения:</div>
+            <div>
+              <label className="text-sm text-slate-400 block mb-2">
+                Твой ход решения (формулы, шаги):
+              </label>
+              <textarea
+                value={mySolution}
+                onChange={(e) => setMySolution(e.target.value)}
+                rows={8}
+                className="w-full p-3 bg-slate-800 rounded-lg text-sm text-slate-100 resize-none focus:outline-none focus:ring-2 focus:ring-slate-600 font-mono"
+                placeholder="Распиши решение по шагам — как делал бы на бумаге..."
+              />
+            </div>
+            <button
+              onClick={() => setStage("comparing")}
+              className="w-full bg-slate-700 hover:bg-slate-600 rounded-lg py-3 font-medium"
+            >
+              Сравнить с эталоном
+            </button>
+          </>
+        )}
+
+        {stage === "comparing" && (
+          <>
+            {mySolution.trim() && (
+              <div className="bg-slate-800 rounded-lg p-3">
+                <div className="text-xs text-slate-400 mb-2">Твой ход:</div>
+                <div className="text-sm text-slate-200 whitespace-pre-wrap font-mono">
+                  {mySolution}
+                </div>
+              </div>
+            )}
+
+            <div className="bg-slate-800 rounded-lg p-3 space-y-2 border border-slate-700">
+              <div className="text-xs text-green-400 uppercase tracking-wider">
+                Эталон
+              </div>
               <ol className="text-sm text-slate-200 space-y-1.5 list-decimal pl-5">
                 {billet.problem.solution_steps.map((step, i) => (
                   <li key={i}>{step}</li>
@@ -97,6 +128,9 @@ export default function ProblemMode({ billet, onClose }: Props) {
               </div>
             </div>
 
+            <div className="text-sm text-slate-400">
+              Сравни честно — твой ход совпал по логике с эталоном?
+            </div>
             <div className="grid grid-cols-2 gap-2">
               <button
                 onClick={() => finalize(false)}
