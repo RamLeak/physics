@@ -36,6 +36,30 @@ export default function ErrorEntryCard({ entry }: Props) {
     month: "short",
   });
 
+  const handleOpen = () => {
+    if (entry.cardId) {
+      navigateTo({
+        kind: "billet",
+        billetId: entry.billetId,
+        focusCardId: entry.cardId,
+      });
+    } else if (entry.problemId) {
+      navigateTo({
+        kind: "billet",
+        billetId: entry.billetId,
+        openProblem: true,
+      });
+    } else {
+      navigateTo({ kind: "billet", billetId: entry.billetId });
+    }
+  };
+
+  const openTitle = entry.cardId
+    ? "Открыть карточку и прорешать"
+    : entry.problemId
+      ? "Открыть задачу"
+      : "Открыть билет";
+
   return (
     <div className="bg-slate-800 rounded-lg p-3 space-y-2">
       <div className="flex items-start justify-between gap-2">
@@ -55,16 +79,25 @@ export default function ErrorEntryCard({ entry }: Props) {
         </div>
         <div className="flex flex-col items-end gap-1 shrink-0">
           <div className="text-[10px] text-slate-500 tabular-nums">{date}</div>
-          <button
-            onClick={() => {
-              if (window.confirm("Удалить эту ошибку из журнала?"))
-                removeError(entry.id);
-            }}
-            className="text-xs text-slate-500 hover:text-red-400 transition-colors"
-            title="Удалить — например, если уже переучил"
-          >
-            ✕
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={handleOpen}
+              className="text-xs text-blue-400 hover:text-blue-300 transition-colors"
+              title={openTitle}
+            >
+              → Открыть
+            </button>
+            <button
+              onClick={() => {
+                if (window.confirm("Удалить эту ошибку из журнала?"))
+                  removeError(entry.id);
+              }}
+              className="text-xs text-slate-500 hover:text-red-400 transition-colors"
+              title="Удалить — например, если уже переучил"
+            >
+              ✕
+            </button>
+          </div>
         </div>
       </div>
 

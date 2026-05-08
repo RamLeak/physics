@@ -1,6 +1,11 @@
 export type Route =
   | { kind: "dashboard" }
-  | { kind: "billet"; billetId: number }
+  | {
+      kind: "billet";
+      billetId: number;
+      focusCardId?: string;
+      openProblem?: boolean;
+    }
   | { kind: "practice" }
   | { kind: "errors" }
   | { kind: "exam" };
@@ -9,11 +14,25 @@ export function parseHash(hash: string): Route {
   if (hash === "#/practice") return { kind: "practice" };
   if (hash === "#/errors") return { kind: "errors" };
   if (hash === "#/exam") return { kind: "exam" };
-  const m = hash.match(/^#\/billet\/(\d+)$/);
+
+  const qIdx = hash.indexOf("?");
+  const path = qIdx >= 0 ? hash.slice(0, qIdx) : hash;
+  const queryStr = qIdx >= 0 ? hash.slice(qIdx + 1) : "";
+
+  const m = path.match(/^#\/billet\/(\d+)$/);
   if (m) {
     const id = parseInt(m[1], 10);
-    if (!Number.isNaN(id)) return { kind: "billet", billetId: id };
+    if (!Number.isNaN(id)) {
+      const params = new URLSearchParams(queryStr);
+      return {
+        kind: "billet",
+        billetId: id,
+        focusCardId: params.get("card") ?? undefined,
+        openProblem: params.get("problem") === "1",
+      };
+    }
   }
+
   return { kind: "dashboard" };
 }
 
@@ -27,6 +46,12 @@ export function navigateTo(route: Route): void {
   } else if (route.kind === "exam") {
     window.location.hash = "#/exam";
   } else {
-    window.location.hash = `#/billet/${route.billetId}`;
+    let url = `#/billet/${route.billetId}`;
+    const params: string[] = [];
+    if (route.focusCardId)
+      params.push(`card=${encodeURIComponent(route.focusCardId)}`);
+    if (route.openProblem) params.push("problem=1");
+    if (params.length > 0) url += "?" + params.join("&");
+    window.location.hash = url;
   }
 }

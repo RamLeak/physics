@@ -46,7 +46,10 @@ export default function CardListItem({
               : "Развёрнутый";
 
   return (
-    <div className="bg-slate-800 rounded-lg p-3">
+    <div
+      id={`card-${card.id}`}
+      className="bg-slate-800 rounded-lg p-3 transition-all"
+    >
       <div className="flex items-start gap-3">
         <div
           className={`w-2.5 h-2.5 rounded-full ${dotColor} mt-1.5 flex-shrink-0`}

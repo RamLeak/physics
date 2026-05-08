@@ -20,6 +20,8 @@ import type { TheoryCard } from "../types/billets";
 
 interface Props {
   billetId: number;
+  focusCardId?: string;
+  openProblem?: boolean;
 }
 
 type Method = "read" | "mc" | "cloze" | "match" | "free";
@@ -30,7 +32,11 @@ type ActiveMode =
   | { kind: "recall" }
   | { kind: "problem" };
 
-export default function BilletPage({ billetId }: Props) {
+export default function BilletPage({
+  billetId,
+  focusCardId,
+  openProblem,
+}: Props) {
   const billet = getBilletById(billetId);
   const progress = useProgressStore((s) => s.billets[billetId]);
   const [active, setActive] = useState<ActiveMode>({ kind: "none" });
@@ -38,6 +44,30 @@ export default function BilletPage({ billetId }: Props) {
   useEffect(() => {
     if (!billet) navigateTo({ kind: "dashboard" });
   }, [billet]);
+
+  useEffect(() => {
+    if (openProblem && billet) {
+      setActive({ kind: "problem" });
+    }
+  }, [openProblem, billet]);
+
+  useEffect(() => {
+    if (!focusCardId || !billet) return;
+    const timer = setTimeout(() => {
+      const el = document.getElementById(`card-${focusCardId}`);
+      if (el) {
+        el.scrollIntoView({ behavior: "smooth", block: "center" });
+        el.classList.add("ring-2", "ring-yellow-400", "animate-pulse");
+        setTimeout(() => {
+          el.classList.remove("animate-pulse");
+          setTimeout(() => {
+            el.classList.remove("ring-2", "ring-yellow-400");
+          }, 800);
+        }, 1500);
+      }
+    }, 100);
+    return () => clearTimeout(timer);
+  }, [focusCardId, billet]);
 
   if (!billet) return null;
 

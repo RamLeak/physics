@@ -31,7 +31,13 @@ export default function AppRouter() {
     return <PracticeMode />;
   }
   if (route.kind === "billet") {
-    return <BilletPage billetId={route.billetId} />;
+    return (
+      <BilletPage
+        billetId={route.billetId}
+        focusCardId={route.focusCardId}
+        openProblem={route.openProblem}
+      />
+    );
   }
   return <Dashboard />;
 }
