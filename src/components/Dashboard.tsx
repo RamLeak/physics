@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 import { getAllBillets } from "../lib/billetsLoader";
 import { calculateOverallProgress } from "../lib/progressMath";
+import { navigateTo } from "../lib/routing";
 import { useProgressStore } from "../store";
 import BilletTile from "./BilletTile";
 import Header from "./Header";
@@ -11,8 +12,8 @@ export default function Dashboard() {
 
   const overall = calculateOverallProgress(billets, progressMap);
 
-  const handleTileClick = (_billetId: number) => {
-    // Навигация на страницу билета — Phase 1.3+
+  const handleTileClick = (billetId: number) => {
+    navigateTo({ kind: "billet", billetId });
   };
 
   return (

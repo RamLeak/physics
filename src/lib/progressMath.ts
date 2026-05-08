@@ -2,20 +2,35 @@ import type { Billet } from "../types/billets";
 import type { BilletProgress } from "../types/progress";
 import { getAllCardIds } from "./billetsLoader";
 
-export function calculateBilletProgress(
+const WEIGHT_THEORY = 0.6;
+const WEIGHT_RECALL = 0.25;
+const WEIGHT_PROBLEM = 0.15;
+
+export function calculateTheoryProgress(
   billet: Billet,
   progress: BilletProgress | undefined,
 ): number {
   const cardIds = getAllCardIds(billet);
   if (cardIds.length === 0) return 0;
-
-  let totalBox = 0;
-  for (const cardId of cardIds) {
-    const cardProgress = progress?.cards[cardId];
-    totalBox += cardProgress ? cardProgress.box : 1;
+  let total = 0;
+  for (const id of cardIds) {
+    const card = progress?.cards[id];
+    total += card ? card.box : 1;
   }
-  const avgBox = totalBox / cardIds.length;
-  return Math.round((avgBox / 5) * 100);
+  return Math.round((total / cardIds.length / 5) * 100);
+}
+
+export function calculateBilletProgress(
+  billet: Billet,
+  progress: BilletProgress | undefined,
+): number {
+  const theory = calculateTheoryProgress(billet, progress) / 100;
+  const recall = progress?.oralRecallDone ? 1 : 0;
+  const problem = progress?.problemSolved ? 1 : 0;
+
+  const composite =
+    theory * WEIGHT_THEORY + recall * WEIGHT_RECALL + problem * WEIGHT_PROBLEM;
+  return Math.round(composite * 100);
 }
 
 export function progressColor(percent: number): string {
@@ -42,6 +57,6 @@ export function isBilletLearned(
   progress: BilletProgress | undefined,
 ): boolean {
   if (!progress) return false;
-  const percent = calculateBilletProgress(billet, progress);
-  return percent === 100 && progress.oralRecallDone;
+  if (!progress.oralRecallDone) return false;
+  return calculateBilletProgress(billet, progress) >= 95;
 }

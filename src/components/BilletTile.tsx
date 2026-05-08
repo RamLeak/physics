@@ -12,6 +12,18 @@ interface BilletTileProps {
   onClick: (billetId: number) => void;
 }
 
+function splitTitle(title: string): [string, string] {
+  const sep = /[.•·|]/;
+  const parts = title
+    .split(sep)
+    .map((s) => s.trim())
+    .filter(Boolean);
+  if (parts.length >= 2) {
+    return [parts[0], parts.slice(1).join(" · ")];
+  }
+  return [title, ""];
+}
+
 export default function BilletTile({
   billet,
   progress,
@@ -21,6 +33,7 @@ export default function BilletTile({
   const learned = isBilletLearned(billet, progress);
   const dupCount = billet.theory_duplicates.length;
   const numLabel = String(billet.id).padStart(2, "0");
+  const [topic1, topic2] = splitTitle(billet.title);
 
   return (
     <button
@@ -47,8 +60,10 @@ export default function BilletTile({
       <div className="text-2xl font-semibold text-slate-100 tabular-nums leading-none">
         {numLabel}
       </div>
-      <div className="text-xs text-slate-300 line-clamp-2 leading-snug pr-6">
-        {billet.title}
+
+      <div className="text-xs text-slate-300 leading-snug pr-6 space-y-0.5">
+        <div className="line-clamp-1">{topic1}</div>
+        {topic2 && <div className="line-clamp-1 text-slate-400">{topic2}</div>}
       </div>
 
       <div className="mt-auto flex items-center gap-2">

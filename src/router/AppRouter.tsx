@@ -1,0 +1,25 @@
+import { useEffect, useState } from "react";
+import { parseHash, type Route } from "../lib/routing";
+import Dashboard from "../components/Dashboard";
+import BilletPage from "../components/BilletPage";
+
+export default function AppRouter() {
+  const [route, setRoute] = useState<Route>(() =>
+    parseHash(window.location.hash),
+  );
+
+  useEffect(() => {
+    const handler = () => setRoute(parseHash(window.location.hash));
+    window.addEventListener("hashchange", handler);
+    return () => window.removeEventListener("hashchange", handler);
+  }, []);
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [route]);
+
+  if (route.kind === "billet") {
+    return <BilletPage billetId={route.billetId} />;
+  }
+  return <Dashboard />;
+}
