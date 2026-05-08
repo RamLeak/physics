@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import type { TheoryCard } from "../../types/billets";
 import { useProgressStore } from "../../store/progressStore";
 import { useErrorsStore } from "../../store/errorsStore";
+import { maskTopic } from "../../lib/maskTopic";
 
 interface Props {
   billetId: number;
@@ -77,7 +78,7 @@ export default function MultipleChoiceMethod({
           К чему относится этот фрагмент?
         </div>
         <div className="bg-slate-800 rounded-lg p-3 text-sm text-slate-200 whitespace-pre-wrap">
-          {card.content.replace(/\*\*/g, "")}
+          {maskTopic(card.content, card.topic)}
         </div>
 
         <div className="space-y-2 pt-2">

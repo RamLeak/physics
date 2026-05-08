@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import type { TheoryCard } from "../../types/billets";
 import { useProgressStore } from "../../store/progressStore";
 import { useErrorsStore } from "../../store/errorsStore";
+import { maskTopic } from "../../lib/maskTopic";
 
 interface Props {
   billetId: number;
@@ -50,7 +51,10 @@ export default function MatchMethod({
   const contents = useMemo(
     () =>
       shuffle(
-        cards.map((c) => ({ id: c.id, text: c.content.replace(/\*\*/g, "") })),
+        cards.map((c) => ({
+          id: c.id,
+          text: maskTopic(c.content, c.topic),
+        })),
       ),
     [cards],
   );
