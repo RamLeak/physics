@@ -6,11 +6,13 @@ import { navigateTo } from "../lib/routing";
 
 interface Props {
   entry: ErrorEntry;
+  isArchived?: boolean;
 }
 
-export default function ErrorEntryCard({ entry }: Props) {
+export default function ErrorEntryCard({ entry, isArchived = false }: Props) {
   const updateMyFix = useErrorsStore((s) => s.updateMyFix);
   const removeError = useErrorsStore((s) => s.removeError);
+  const removeFromArchive = useErrorsStore((s) => s.removeFromArchive);
   const [myFix, setMyFix] = useState(entry.myFix);
   const [savedFlash, setSavedFlash] = useState(false);
 
@@ -60,6 +62,22 @@ export default function ErrorEntryCard({ entry }: Props) {
       ? "Открыть задачу"
       : "Открыть билет";
 
+  const handleRemove = () => {
+    if (isArchived) {
+      if (
+        window.confirm(
+          "Удалить из архива? Эта запись больше не появится перед экзаменом.",
+        )
+      ) {
+        removeFromArchive(entry.id);
+      }
+    } else {
+      if (window.confirm("Удалить эту ошибку из журнала?")) {
+        removeError(entry.id);
+      }
+    }
+  };
+
   return (
     <div className="bg-slate-800 rounded-lg p-3 space-y-2">
       <div className="flex items-start justify-between gap-2">
@@ -79,6 +97,11 @@ export default function ErrorEntryCard({ entry }: Props) {
         </div>
         <div className="flex flex-col items-end gap-1 shrink-0">
           <div className="text-[10px] text-slate-500 tabular-nums">{date}</div>
+          {isArchived && entry.archivedAt && (
+            <div className="text-[10px] text-green-500 tabular-nums">
+              ✓ переучено
+            </div>
+          )}
           <div className="flex items-center gap-2">
             <button
               onClick={handleOpen}
@@ -88,12 +111,13 @@ export default function ErrorEntryCard({ entry }: Props) {
               → Открыть
             </button>
             <button
-              onClick={() => {
-                if (window.confirm("Удалить эту ошибку из журнала?"))
-                  removeError(entry.id);
-              }}
+              onClick={handleRemove}
               className="text-xs text-slate-500 hover:text-red-400 transition-colors"
-              title="Удалить — например, если уже переучил"
+              title={
+                isArchived
+                  ? "Удалить из архива навсегда"
+                  : "Удалить — например, если уже переучил"
+              }
             >
               ✕
             </button>

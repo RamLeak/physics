@@ -5,19 +5,25 @@ import { navigateTo } from "../lib/routing";
 import ErrorEntryCard from "./ErrorEntryCard";
 import BackButton from "./BackButton";
 
+type Tab = "active" | "archive";
+
 export default function ErrorJournalPage() {
   const entries = useErrorsStore((s) => s.entries);
+  const archived = useErrorsStore((s) => s.archived);
+  const [tab, setTab] = useState<Tab>("active");
   const [filterBilletId, setFilterBilletId] = useState<number | "all">("all");
 
+  const data = tab === "active" ? entries : archived;
+
   const billetIds = useMemo(() => {
-    const set = new Set(entries.map((e) => e.billetId));
+    const set = new Set(data.map((e) => e.billetId));
     return Array.from(set).sort((a, b) => a - b);
-  }, [entries]);
+  }, [data]);
 
   const filtered = useMemo(() => {
-    if (filterBilletId === "all") return entries;
-    return entries.filter((e) => e.billetId === filterBilletId);
-  }, [entries, filterBilletId]);
+    if (filterBilletId === "all") return data;
+    return data.filter((e) => e.billetId === filterBilletId);
+  }, [data, filterBilletId]);
 
   const grouped = useMemo<[number, ErrorEntry[]][]>(() => {
     const map = new Map<number, ErrorEntry[]>();
@@ -33,28 +39,58 @@ export default function ErrorJournalPage() {
     <div className="max-w-2xl mx-auto p-4 space-y-4">
       <div className="flex items-center justify-between">
         <BackButton onClick={() => navigateTo({ kind: "dashboard" })} />
-        <div className="text-sm text-slate-400">
-          {entries.length} в журнале
-        </div>
       </div>
 
       <header className="space-y-2">
         <h1 className="text-xl font-semibold">📓 Журнал ошибок</h1>
-        <p className="text-sm text-slate-400 leading-relaxed">
-          Сюда автоматически попадает всё, на что ты ответил «не знаю». Под
-          каждой записью — поле «как не повторить»: впиши формулу, мнемонику
-          или фразу-якорь. Когда переучишь — запись очистится сама (после
-          первого «знаю» по этой карточке) или удали кнопкой ✕.
+        <p className="text-xs text-slate-400 leading-relaxed">
+          В <strong>активных</strong> — текущие ошибки. Когда переучишь
+          карточку (нажмёшь «Знаю» в любом методе), она переедет в{" "}
+          <strong>архив</strong> — и вернётся напомнить о себе за день до
+          экзамена. Если та же карточка снова попадёт в «не знаю» — вернётся
+          обратно в активные.
         </p>
       </header>
 
-      {entries.length === 0 ? (
+      <div className="grid grid-cols-2 gap-1 bg-slate-800 rounded-lg p-1">
+        <button
+          onClick={() => {
+            setTab("active");
+            setFilterBilletId("all");
+          }}
+          className={`text-sm py-2 rounded transition-colors ${
+            tab === "active"
+              ? "bg-slate-700 text-slate-100"
+              : "text-slate-400 hover:text-slate-200"
+          }`}
+        >
+          Активные ({entries.length})
+        </button>
+        <button
+          onClick={() => {
+            setTab("archive");
+            setFilterBilletId("all");
+          }}
+          className={`text-sm py-2 rounded transition-colors ${
+            tab === "archive"
+              ? "bg-slate-700 text-slate-100"
+              : "text-slate-400 hover:text-slate-200"
+          }`}
+        >
+          Архив ({archived.length})
+        </button>
+      </div>
+
+      {data.length === 0 ? (
         <div className="bg-slate-800 rounded-lg p-6 text-center">
-          <div className="text-4xl mb-2">🎉</div>
-          <div className="text-sm text-slate-300">Журнал пуст.</div>
+          <div className="text-4xl mb-2">{tab === "active" ? "🎉" : "📦"}</div>
+          <div className="text-sm text-slate-300">
+            {tab === "active" ? "Активных ошибок нет." : "Архив пуст."}
+          </div>
           <div className="text-xs text-slate-500 mt-1">
-            Учись через билеты или Тренировку — ошибки запишутся сюда
-            автоматически.
+            {tab === "active"
+              ? "Учись через билеты или Тренировку — ошибки запишутся сюда автоматически."
+              : "Когда переучишь карточку, она переедет сюда. За день до экзамена — напомню."}
           </div>
         </div>
       ) : (
@@ -69,13 +105,11 @@ export default function ErrorJournalPage() {
                     : "bg-slate-800 hover:bg-slate-700 text-slate-300"
                 }`}
               >
-                Все ({entries.length})
+                Все ({data.length})
               </button>
               {billetIds.map((bid) => {
                 const billet = getBilletById(bid);
-                const count = entries.filter(
-                  (e) => e.billetId === bid,
-                ).length;
+                const count = data.filter((e) => e.billetId === bid).length;
                 return (
                   <button
                     key={bid}
@@ -105,7 +139,11 @@ export default function ErrorJournalPage() {
                   </div>
                   <div className="space-y-2">
                     {items.map((e) => (
-                      <ErrorEntryCard key={e.id} entry={e} />
+                      <ErrorEntryCard
+                        key={e.id}
+                        entry={e}
+                        isArchived={tab === "archive"}
+                      />
                     ))}
                   </div>
                 </section>
