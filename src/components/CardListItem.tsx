@@ -2,7 +2,7 @@ import type { TheoryCard } from "../types/billets";
 import { useProgressStore } from "../store/progressStore";
 import { suggestMethod } from "../lib/leitner";
 
-type Method = "read" | "mc" | "cloze";
+type Method = "read" | "mc" | "cloze" | "match" | "free";
 
 interface Props {
   billetId: number;
@@ -39,9 +39,11 @@ export default function CardListItem({
         ? "Выбор"
         : suggested === "cloze"
           ? "Пропуск"
-          : suggested === "free_answer"
-            ? "Свободный"
-            : "Развёрнутый";
+          : suggested === "match"
+            ? "Сопоставить"
+            : suggested === "free_answer"
+              ? "Определение"
+              : "Развёрнутый";
 
   return (
     <div className="bg-slate-800 rounded-lg p-3">
@@ -75,6 +77,20 @@ export default function CardListItem({
           className="bg-slate-700 hover:bg-slate-600 rounded text-xs py-1.5 transition-colors"
         >
           Пропуск
+        </button>
+      </div>
+      <div className="grid grid-cols-2 gap-1.5 mt-1.5">
+        <button
+          onClick={() => onChooseMethod("match")}
+          className="bg-slate-700 hover:bg-slate-600 rounded text-xs py-1.5 transition-colors"
+        >
+          Сопоставить
+        </button>
+        <button
+          onClick={() => onChooseMethod("free")}
+          className="bg-slate-700 hover:bg-slate-600 rounded text-xs py-1.5 transition-colors"
+        >
+          Определение
         </button>
       </div>
     </div>

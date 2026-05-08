@@ -1,8 +1,10 @@
 export type Route =
   | { kind: "dashboard" }
-  | { kind: "billet"; billetId: number };
+  | { kind: "billet"; billetId: number }
+  | { kind: "practice" };
 
 export function parseHash(hash: string): Route {
+  if (hash === "#/practice") return { kind: "practice" };
   const m = hash.match(/^#\/billet\/(\d+)$/);
   if (m) {
     const id = parseInt(m[1], 10);
@@ -14,6 +16,8 @@ export function parseHash(hash: string): Route {
 export function navigateTo(route: Route): void {
   if (route.kind === "dashboard") {
     window.location.hash = "#/";
+  } else if (route.kind === "practice") {
+    window.location.hash = "#/practice";
   } else {
     window.location.hash = `#/billet/${route.billetId}`;
   }

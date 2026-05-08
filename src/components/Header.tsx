@@ -1,4 +1,5 @@
 import { useProgressStore } from "../store";
+import { navigateTo } from "../lib/routing";
 import ProgressBar from "./ProgressBar";
 
 interface HeaderProps {
@@ -22,23 +23,34 @@ export default function Header({ overallPercent }: HeaderProps) {
 
   return (
     <header className="sticky top-0 z-10 bg-slate-900 border-b border-slate-700">
-      <div className="max-w-4xl mx-auto px-4 py-3 flex items-center gap-3">
-        <span className="text-xs text-slate-400 shrink-0">Physics Trainer</span>
+      <div className="max-w-4xl mx-auto px-4 py-3 flex items-center gap-2">
+        <span className="hidden sm:inline text-xs text-slate-400 shrink-0">
+          Physics Trainer
+        </span>
 
         <div className="flex-1 min-w-0 flex items-center gap-2">
-          <span className="text-xs text-slate-300 shrink-0">
-            Готовность: {overallPercent}%
+          <span className="text-xs text-slate-300 shrink-0 tabular-nums">
+            {overallPercent}%
           </span>
           <ProgressBar percent={overallPercent} height="sm" />
         </div>
 
         <button
           type="button"
+          onClick={() => navigateTo({ kind: "practice" })}
+          className="shrink-0 px-3 py-1.5 text-xs font-medium bg-green-900 hover:bg-green-800 rounded-lg transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-400"
+          title="Тренировка как в ПДД — случайные карточки из всех билетов"
+        >
+          🎯<span className="hidden sm:inline ml-1">Тренировка</span>
+        </button>
+
+        <button
+          type="button"
           onClick={handleExport}
-          className="shrink-0 px-2 py-1 text-xs text-slate-200 bg-slate-800 hover:bg-slate-700 rounded-md border border-slate-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-400"
+          className="shrink-0 px-2 py-1.5 text-xs text-slate-200 bg-slate-800 hover:bg-slate-700 rounded-md border border-slate-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-400"
           title="Экспорт прогресса"
         >
-          ⤓ Экспорт
+          ⤓<span className="hidden sm:inline ml-1">Экспорт</span>
         </button>
       </div>
     </header>

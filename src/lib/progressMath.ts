@@ -15,9 +15,10 @@ export function calculateTheoryProgress(
   let total = 0;
   for (const id of cardIds) {
     const card = progress?.cards[id];
-    total += card ? card.box : 1;
+    const box = card ? card.box : 1;
+    total += ((box - 1) / 4) * 100;
   }
-  return Math.round((total / cardIds.length / 5) * 100);
+  return Math.round(total / cardIds.length);
 }
 
 export function calculateBilletProgress(

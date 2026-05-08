@@ -34,9 +34,9 @@ export function suggestMethod(box: LeitnerBox): LearnMethod {
     case 3:
       return "cloze";
     case 4:
-      return "free_answer";
+      return "match";
     case 5:
-      return "extended";
+      return "free_answer";
     default:
       return "read";
   }

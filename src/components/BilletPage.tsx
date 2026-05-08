@@ -12,6 +12,8 @@ import CardListItem from "./CardListItem";
 import ReadMethod from "./methods/ReadMethod";
 import MultipleChoiceMethod from "./methods/MultipleChoiceMethod";
 import ClozeMethod from "./methods/ClozeMethod";
+import MatchMethod from "./methods/MatchMethod";
+import FreeAnswerMethod from "./methods/FreeAnswerMethod";
 import ConnectedRecallMode from "./ConnectedRecallMode";
 import ProblemMode from "./ProblemMode";
 import type { TheoryCard } from "../types/billets";
@@ -20,7 +22,7 @@ interface Props {
   billetId: number;
 }
 
-type Method = "read" | "mc" | "cloze";
+type Method = "read" | "mc" | "cloze" | "match" | "free";
 
 type ActiveMode =
   | { kind: "none" }
@@ -67,7 +69,24 @@ export default function BilletPage({ billetId }: Props) {
         />
       );
     }
-    return <ClozeMethod billetId={billetId} card={found} onClose={close} />;
+    if (active.method === "cloze") {
+      return (
+        <ClozeMethod billetId={billetId} card={found} onClose={close} />
+      );
+    }
+    if (active.method === "match") {
+      return (
+        <MatchMethod
+          billetId={billetId}
+          card={found}
+          allCards={allCards}
+          onClose={close}
+        />
+      );
+    }
+    return (
+      <FreeAnswerMethod billetId={billetId} card={found} onClose={close} />
+    );
   }
 
   if (active.kind === "recall") {

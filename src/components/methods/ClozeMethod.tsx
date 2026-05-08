@@ -7,9 +7,15 @@ interface Props {
   billetId: number;
   card: TheoryCard;
   onClose: () => void;
+  onResult?: (knew: boolean) => void;
 }
 
-export default function ClozeMethod({ billetId, card, onClose }: Props) {
+export default function ClozeMethod({
+  billetId,
+  card,
+  onClose,
+  onResult,
+}: Props) {
   const reviewCard = useProgressStore((s) => s.reviewCard);
   const cloze = useMemo(() => buildCloze(card), [card]);
   const [answers, setAnswers] = useState<string[]>(() =>
@@ -56,7 +62,11 @@ export default function ClozeMethod({ billetId, card, onClose }: Props) {
 
   const finalize = (knew: boolean) => {
     reviewCard(billetId, card.id, knew);
-    onClose();
+    if (onResult) {
+      onResult(knew);
+    } else {
+      onClose();
+    }
   };
 
   return (

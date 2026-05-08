@@ -7,6 +7,7 @@ interface Props {
   card: TheoryCard;
   allCards: TheoryCard[];
   onClose: () => void;
+  onResult?: (knew: boolean) => void;
 }
 
 function shuffle<T>(arr: T[]): T[] {
@@ -23,6 +24,7 @@ export default function MultipleChoiceMethod({
   card,
   allCards,
   onClose,
+  onResult,
 }: Props) {
   const reviewCard = useProgressStore((s) => s.reviewCard);
   const [picked, setPicked] = useState<string | null>(null);
@@ -37,7 +39,11 @@ export default function MultipleChoiceMethod({
 
   const handle = (knew: boolean) => {
     reviewCard(billetId, card.id, knew);
-    onClose();
+    if (onResult) {
+      onResult(knew);
+    } else {
+      onClose();
+    }
   };
 
   return (
