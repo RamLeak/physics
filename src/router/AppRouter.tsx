@@ -3,6 +3,7 @@ import { parseHash, type Route } from "../lib/routing";
 import Dashboard from "../components/Dashboard";
 import BilletPage from "../components/BilletPage";
 import PracticeMode from "../components/PracticeMode";
+import ErrorJournalPage from "../components/ErrorJournalPage";
 
 export default function AppRouter() {
   const [route, setRoute] = useState<Route>(() =>
@@ -19,6 +20,9 @@ export default function AppRouter() {
     window.scrollTo(0, 0);
   }, [route]);
 
+  if (route.kind === "errors") {
+    return <ErrorJournalPage />;
+  }
   if (route.kind === "practice") {
     return <PracticeMode />;
   }

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import type { Billet } from "../types/billets";
 import { useProgressStore } from "../store/progressStore";
+import { useErrorsStore } from "../store/errorsStore";
 
 interface Props {
   billet: Billet;
@@ -9,6 +10,8 @@ interface Props {
 
 export default function ProblemMode({ billet, onClose }: Props) {
   const markProblemSolved = useProgressStore((s) => s.markProblemSolved);
+  const addError = useErrorsStore((s) => s.addError);
+  const removeByProblemId = useErrorsStore((s) => s.removeByProblemId);
   const currentlySolved = useProgressStore(
     (s) => s.billets[billet.id]?.problemSolved ?? false,
   );
@@ -17,6 +20,16 @@ export default function ProblemMode({ billet, onClose }: Props) {
 
   const finalize = (solved: boolean) => {
     markProblemSolved(billet.id, solved);
+    if (solved) {
+      removeByProblemId(billet.id, billet.problem.id);
+    } else {
+      addError({
+        billetId: billet.id,
+        cardId: null,
+        problemId: billet.problem.id,
+        what: billet.problem.title,
+      });
+    }
     onClose();
   };
 

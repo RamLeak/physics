@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import type { TheoryCard } from "../../types/billets";
 import { useProgressStore } from "../../store/progressStore";
+import { useErrorsStore } from "../../store/errorsStore";
 import { buildCloze, checkBlank } from "../../lib/cloze";
 
 interface Props {
@@ -17,6 +18,8 @@ export default function ClozeMethod({
   onResult,
 }: Props) {
   const reviewCard = useProgressStore((s) => s.reviewCard);
+  const addError = useErrorsStore((s) => s.addError);
+  const removeByCardId = useErrorsStore((s) => s.removeByCardId);
   const cloze = useMemo(() => buildCloze(card), [card]);
   const [answers, setAnswers] = useState<string[]>(() =>
     cloze.blanks.map(() => ""),
@@ -62,6 +65,16 @@ export default function ClozeMethod({
 
   const finalize = (knew: boolean) => {
     reviewCard(billetId, card.id, knew);
+    if (knew) {
+      removeByCardId(billetId, card.id);
+    } else {
+      addError({
+        billetId,
+        cardId: card.id,
+        problemId: null,
+        what: card.topic,
+      });
+    }
     if (onResult) {
       onResult(knew);
     } else {

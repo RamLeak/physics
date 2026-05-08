@@ -1,6 +1,7 @@
 import { useState, useMemo } from "react";
 import type { TheoryCard } from "../../types/billets";
 import { useProgressStore } from "../../store/progressStore";
+import { useErrorsStore } from "../../store/errorsStore";
 import { matchKeyTerms } from "../../lib/similarity";
 import { renderMarkdownLite } from "../../lib/markdownLite";
 
@@ -18,6 +19,8 @@ export default function FreeAnswerMethod({
   onResult,
 }: Props) {
   const reviewCard = useProgressStore((s) => s.reviewCard);
+  const addError = useErrorsStore((s) => s.addError);
+  const removeByCardId = useErrorsStore((s) => s.removeByCardId);
   const [answer, setAnswer] = useState("");
   const [revealed, setRevealed] = useState(false);
 
@@ -28,6 +31,16 @@ export default function FreeAnswerMethod({
 
   const finalize = (knew: boolean) => {
     reviewCard(billetId, card.id, knew);
+    if (knew) {
+      removeByCardId(billetId, card.id);
+    } else {
+      addError({
+        billetId,
+        cardId: card.id,
+        problemId: null,
+        what: card.topic,
+      });
+    }
     if (onResult) {
       onResult(knew);
     } else {

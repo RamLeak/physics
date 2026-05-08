@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import type { TheoryCard } from "../../types/billets";
 import { useProgressStore } from "../../store/progressStore";
+import { useErrorsStore } from "../../store/errorsStore";
 
 interface Props {
   billetId: number;
@@ -33,6 +34,8 @@ export default function MatchMethod({
   onResult,
 }: Props) {
   const reviewCard = useProgressStore((s) => s.reviewCard);
+  const addError = useErrorsStore((s) => s.addError);
+  const removeByCardId = useErrorsStore((s) => s.removeByCardId);
 
   const cards = useMemo(() => {
     const others = allCards.filter((c) => c.id !== card.id);
@@ -81,6 +84,16 @@ export default function MatchMethod({
 
   const finalize = (knew: boolean) => {
     reviewCard(billetId, card.id, knew);
+    if (knew) {
+      removeByCardId(billetId, card.id);
+    } else {
+      addError({
+        billetId,
+        cardId: card.id,
+        problemId: null,
+        what: card.topic,
+      });
+    }
     if (onResult) {
       onResult(knew);
     } else {
