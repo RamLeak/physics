@@ -58,8 +58,6 @@ export default function MatchMethod({
 
   const isPaired = (id: string) =>
     pairs.some((p) => p.topicId === id || p.contentId === id);
-  const pairOf = (id: string) =>
-    pairs.find((p) => p.topicId === id || p.contentId === id);
 
   const handleTopicClick = (topicId: string) => {
     if (isPaired(topicId)) return;
@@ -90,10 +88,17 @@ export default function MatchMethod({
     }
   };
 
-  const colorFor = (id: string): string => {
-    const p = pairOf(id);
-    if (!p) return id === selectedTopic ? "bg-slate-600" : "bg-slate-800";
-    return p.correct ? "bg-green-900" : "bg-red-900";
+  const colorForTopic = (topicId: string): string => {
+    const pair = pairs.find((p) => p.topicId === topicId);
+    if (pair) return pair.correct ? "bg-green-900" : "bg-red-900";
+    if (topicId === selectedTopic) return "bg-blue-900";
+    return "bg-slate-800";
+  };
+
+  const colorForContent = (contentId: string): string => {
+    const pair = pairs.find((p) => p.contentId === contentId);
+    if (pair) return pair.correct ? "bg-green-900" : "bg-red-900";
+    return "bg-slate-800";
   };
 
   return (
@@ -125,7 +130,7 @@ export default function MatchMethod({
                 key={t.id}
                 onClick={() => handleTopicClick(t.id)}
                 disabled={isPaired(t.id)}
-                className={`w-full text-left p-3 rounded-lg text-sm transition-colors ${colorFor(t.id)} ${
+                className={`w-full text-left p-3 rounded-lg text-sm transition-colors disabled:opacity-60 ${colorForTopic(t.id)} ${
                   isPaired(t.id) ? "" : "hover:bg-slate-700"
                 }`}
               >
@@ -143,7 +148,7 @@ export default function MatchMethod({
                 key={c.id}
                 onClick={() => handleContentClick(c.id)}
                 disabled={isPaired(c.id) || !selectedTopic}
-                className={`w-full text-left p-3 rounded-lg text-xs whitespace-pre-wrap transition-colors ${colorFor(c.id)} ${
+                className={`w-full text-left p-3 rounded-lg text-xs whitespace-pre-wrap transition-colors disabled:opacity-60 ${colorForContent(c.id)} ${
                   isPaired(c.id) || !selectedTopic ? "" : "hover:bg-slate-700"
                 }`}
               >
