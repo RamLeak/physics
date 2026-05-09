@@ -10,6 +10,8 @@ interface Props {
   allCards: TheoryCard[];
   onClose: () => void;
   onResult?: (knew: boolean) => void;
+  skipLeitner?: boolean;
+  skipErrors?: boolean;
 }
 
 interface Pair {
@@ -33,6 +35,8 @@ export default function MatchMethod({
   allCards,
   onClose,
   onResult,
+  skipLeitner,
+  skipErrors,
 }: Props) {
   const reviewCard = useProgressStore((s) => s.reviewCard);
   const addError = useErrorsStore((s) => s.addError);
@@ -87,10 +91,14 @@ export default function MatchMethod({
   const wasCorrectForTarget = targetPair?.correct ?? false;
 
   const finalize = (knew: boolean) => {
-    reviewCard(billetId, card.id, knew);
-    if (knew) {
-      removeByCardId(billetId, card.id);
-    } else {
+    if (!skipLeitner) {
+      reviewCard(billetId, card.id, knew);
+      if (knew) {
+        removeByCardId(billetId, card.id);
+      }
+    }
+
+    if (!knew && !skipErrors) {
       addError({
         billetId,
         cardId: card.id,
@@ -98,11 +106,9 @@ export default function MatchMethod({
         what: card.topic,
       });
     }
-    if (onResult) {
-      onResult(knew);
-    } else {
-      onClose();
-    }
+
+    if (onResult) onResult(knew);
+    else onClose();
   };
 
   const colorForTopic = (topicId: string): string => {

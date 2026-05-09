@@ -54,6 +54,32 @@ export default function ConnectedRecallMode({ billet, onClose }: Props) {
                 упустил, что сказал хорошо.
               </p>
             </div>
+
+            <div className="space-y-2">
+              <div className="text-xs uppercase tracking-wider text-slate-500">
+                О чём рассказывать
+              </div>
+              <div className="bg-slate-800 rounded-lg p-4 space-y-3">
+                <div>
+                  <div className="text-xs text-slate-500 mb-1">Вопрос 1</div>
+                  <div className="text-sm text-slate-200 leading-snug">
+                    {billet.theory_q1.title}
+                  </div>
+                </div>
+                <div className="border-t border-slate-700" />
+                <div>
+                  <div className="text-xs text-slate-500 mb-1">Вопрос 2</div>
+                  <div className="text-sm text-slate-200 leading-snug">
+                    {billet.theory_q2.title}
+                  </div>
+                </div>
+              </div>
+              <div className="text-xs text-slate-500 italic">
+                Только заголовки — не подсказки. Содержимое раскроется в
+                чек-листе после рассказа.
+              </div>
+            </div>
+
             <button
               onClick={() => setStage("revealed")}
               className="w-full bg-slate-700 hover:bg-slate-600 rounded-lg py-3 font-medium"

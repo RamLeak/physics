@@ -16,6 +16,7 @@ import MatchMethod from "./methods/MatchMethod";
 import FreeAnswerMethod from "./methods/FreeAnswerMethod";
 import ConnectedRecallMode from "./ConnectedRecallMode";
 import ProblemMode from "./ProblemMode";
+import BilletTestMode from "./BilletTestMode";
 import type { TheoryCard } from "../types/billets";
 
 interface Props {
@@ -30,7 +31,8 @@ type ActiveMode =
   | { kind: "none" }
   | { kind: "method"; cardId: string; method: Method }
   | { kind: "recall" }
-  | { kind: "problem" };
+  | { kind: "problem" }
+  | { kind: "test" };
 
 export default function BilletPage({
   billetId,
@@ -127,6 +129,10 @@ export default function BilletPage({
     return <ProblemMode billet={billet} onClose={close} />;
   }
 
+  if (active.kind === "test") {
+    return <BilletTestMode billet={billet} onClose={close} />;
+  }
+
   return (
     <div className="max-w-4xl mx-auto p-4 space-y-4">
       <div className="flex items-center justify-between">
@@ -187,25 +193,36 @@ export default function BilletPage({
         </div>
       )}
 
-      <div className="grid grid-cols-2 gap-2">
+      <div className="space-y-2">
         <button
-          onClick={() => setActive({ kind: "recall" })}
-          className="bg-slate-800 hover:bg-slate-700 rounded-lg p-3 text-left transition-colors"
+          onClick={() => setActive({ kind: "test" })}
+          className="w-full bg-blue-900 hover:bg-blue-800 rounded-lg p-3 text-left transition-colors"
         >
-          <div className="text-sm font-medium">🎤 Связный пересказ</div>
-          <div className="text-xs text-slate-400 mt-0.5">
-            {recallDone ? "Пройден" : "Не пройден"}
+          <div className="text-sm font-medium">📝 Тест по билету</div>
+          <div className="text-xs text-blue-200 mt-0.5">
+            Все карточки случайным методом · самопроверка
           </div>
         </button>
-        <button
-          onClick={() => setActive({ kind: "problem" })}
-          className="bg-slate-800 hover:bg-slate-700 rounded-lg p-3 text-left transition-colors"
-        >
-          <div className="text-sm font-medium">📐 Задача</div>
-          <div className="text-xs text-slate-400 mt-0.5">
-            {problemSolved ? "Решена" : "Не решена"}
-          </div>
-        </button>
+        <div className="grid grid-cols-2 gap-2">
+          <button
+            onClick={() => setActive({ kind: "recall" })}
+            className="bg-slate-800 hover:bg-slate-700 rounded-lg p-3 text-left transition-colors"
+          >
+            <div className="text-sm font-medium">🎤 Связный пересказ</div>
+            <div className="text-xs text-slate-400 mt-0.5">
+              {recallDone ? "Пройден" : "Не пройден"}
+            </div>
+          </button>
+          <button
+            onClick={() => setActive({ kind: "problem" })}
+            className="bg-slate-800 hover:bg-slate-700 rounded-lg p-3 text-left transition-colors"
+          >
+            <div className="text-sm font-medium">📐 Задача</div>
+            <div className="text-xs text-slate-400 mt-0.5">
+              {problemSolved ? "Решена" : "Не решена"}
+            </div>
+          </button>
+        </div>
       </div>
 
       <section>

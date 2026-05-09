@@ -10,6 +10,8 @@ interface Props {
   card: TheoryCard;
   onClose: () => void;
   onResult?: (knew: boolean) => void;
+  skipLeitner?: boolean;
+  skipErrors?: boolean;
 }
 
 export default function FreeAnswerMethod({
@@ -17,6 +19,8 @@ export default function FreeAnswerMethod({
   card,
   onClose,
   onResult,
+  skipLeitner,
+  skipErrors,
 }: Props) {
   const reviewCard = useProgressStore((s) => s.reviewCard);
   const addError = useErrorsStore((s) => s.addError);
@@ -30,10 +34,14 @@ export default function FreeAnswerMethod({
   );
 
   const finalize = (knew: boolean) => {
-    reviewCard(billetId, card.id, knew);
-    if (knew) {
-      removeByCardId(billetId, card.id);
-    } else {
+    if (!skipLeitner) {
+      reviewCard(billetId, card.id, knew);
+      if (knew) {
+        removeByCardId(billetId, card.id);
+      }
+    }
+
+    if (!knew && !skipErrors) {
       addError({
         billetId,
         cardId: card.id,
@@ -41,11 +49,9 @@ export default function FreeAnswerMethod({
         what: card.topic,
       });
     }
-    if (onResult) {
-      onResult(knew);
-    } else {
-      onClose();
-    }
+
+    if (onResult) onResult(knew);
+    else onClose();
   };
 
   return (
